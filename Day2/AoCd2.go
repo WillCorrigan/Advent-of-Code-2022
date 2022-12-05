@@ -2,19 +2,10 @@ package main
 
 import (
 	"fmt"
-	"log"
-	"os"
 	"strings"
+
+	loadTextInput "github.com/WillCorrigan/AdventOfCode2022/LoadTextInput"
 )
-
-func LoadInput(path string) string {
-	input, err := os.ReadFile(path)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return string(input)
-}
 
 func main() {
 	Part1()
@@ -30,7 +21,7 @@ func main() {
 }
 
 func Part1() {
-	inputResult := LoadInput("input.txt")
+	inputResult := loadTextInput.LoadInput("input.txt")
 
 	test := strings.Split(inputResult, "\n")
 
@@ -82,7 +73,7 @@ func Part1() {
 
 func Part1Map() {
 
-	inputResult := LoadInput("input.txt")
+	inputResult := loadTextInput.LoadInput("input.txt")
 
 	test := strings.Split(inputResult, "\n")
 
@@ -113,7 +104,7 @@ func Part2Map() {
 	//Y == draw
 	//Z == win
 
-	inputResult := LoadInput("input.txt")
+	inputResult := loadTextInput.LoadInput("input.txt")
 
 	test := strings.Split(inputResult, "\n")
 
