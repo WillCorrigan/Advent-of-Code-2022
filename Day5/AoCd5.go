@@ -43,9 +43,7 @@ func GetFormattedData() ([][]string, []string) {
 	return formattedArr, parse
 }
 
-func Part1() {
-	formattedArray, parse := GetFormattedData()
-
+func UpdateArray(parse []string, formattedArray [][]string, reverse bool) [][]string {
 	for _, v := range parse[10:] {
 		splitThings := strings.Split(v, " ")
 		amountToPop, _ := strconv.Atoi(splitThings[1])
@@ -56,13 +54,26 @@ func Part1() {
 		arrayPointerToPopFrom := &formattedArray[arrayIndexToPopFrom]
 		toPopLen := len(*arrayPointerToPopFrom) - amountToPop
 		items := (*arrayPointerToPopFrom)[toPopLen:len(*arrayPointerToPopFrom)]
-		var itemsReversed []string
-		for i := len(items) - 1; i >= 0; i-- {
-			itemsReversed = append(itemsReversed, items[i])
+		if reverse {
+			var itemsReversed []string
+			for i := len(items) - 1; i >= 0; i-- {
+				itemsReversed = append(itemsReversed, items[i])
+			}
+			*arrayPointerToPopFrom = (*arrayPointerToPopFrom)[:toPopLen]
+			formattedArray[arrayIndexToPushTo] = append(formattedArray[arrayIndexToPushTo], itemsReversed...)
+		} else {
+			*arrayPointerToPopFrom = (*arrayPointerToPopFrom)[:toPopLen]
+			formattedArray[arrayIndexToPushTo] = append(formattedArray[arrayIndexToPushTo], items...)
 		}
-		*arrayPointerToPopFrom = (*arrayPointerToPopFrom)[:toPopLen]
-		formattedArray[arrayIndexToPushTo] = append(formattedArray[arrayIndexToPushTo], itemsReversed...)
 	}
+
+	return formattedArray
+}
+
+func Part1() {
+	formattedArray, parse := GetFormattedData()
+
+	formattedArray = UpdateArray(parse, formattedArray, true)
 
 	for _, v := range formattedArray {
 		fmt.Print(v[len(v)-1])
@@ -73,19 +84,7 @@ func Part1() {
 func Part2() {
 	formattedArray, parse := GetFormattedData()
 
-	for _, v := range parse[10:] {
-		splitThings := strings.Split(v, " ")
-		amountToPop, _ := strconv.Atoi(splitThings[1])
-		arrayIndexToPopFrom, _ := strconv.Atoi(splitThings[3])
-		arrayIndexToPopFrom -= 1
-		arrayIndexToPushTo, _ := strconv.Atoi(splitThings[5])
-		arrayIndexToPushTo -= 1
-		arrayPointerToPopFrom := &formattedArray[arrayIndexToPopFrom]
-		toPopLen := len(*arrayPointerToPopFrom) - amountToPop
-		items := (*arrayPointerToPopFrom)[toPopLen:len(*arrayPointerToPopFrom)]
-		*arrayPointerToPopFrom = (*arrayPointerToPopFrom)[:toPopLen]
-		formattedArray[arrayIndexToPushTo] = append(formattedArray[arrayIndexToPushTo], items...)
-	}
+	formattedArray = UpdateArray(parse, formattedArray, false)
 
 	for _, v := range formattedArray {
 		fmt.Print(v[len(v)-1])
