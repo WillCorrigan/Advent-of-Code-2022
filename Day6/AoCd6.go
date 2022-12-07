@@ -11,12 +11,11 @@ func main() {
 	Part2()
 }
 
-func Part1() {
-	inputResult := loadTextInput.LoadInput("input.txt")
-	indx := 4
-	for i, _ := range inputResult {
+func SlidingWindow(inputResult string, setSize int) {
+	indx := setSize
+	for i := range inputResult {
 		isUnique := make(map[rune]bool)
-		slidingWindow := inputResult[i : i+4]
+		slidingWindow := inputResult[i : i+setSize]
 		for _, slidingWindowValue := range slidingWindow {
 			if _, ok := isUnique[slidingWindowValue]; ok {
 				isUnique[slidingWindowValue] = false
@@ -42,34 +41,15 @@ func Part1() {
 	}
 }
 
+func Part1() {
+	inputResult := loadTextInput.LoadInput("input.txt")
+
+	SlidingWindow(inputResult, 4)
+}
+
 // it's just part 1 but with 14 lol??
 func Part2() {
 	inputResult := loadTextInput.LoadInput("input.txt")
-	indx := 14
-	for i, _ := range inputResult {
-		isUnique := make(map[rune]bool)
-		slidingWindow := inputResult[i : i+14]
-		for _, slidingWindowValue := range slidingWindow {
-			if _, ok := isUnique[slidingWindowValue]; ok {
-				isUnique[slidingWindowValue] = false
-			} else {
-				isUnique[slidingWindowValue] = true
-			}
-		}
 
-		allUnique := true
-		for _, value := range isUnique {
-			if !value {
-				allUnique = false
-				break
-			}
-		}
-
-		if allUnique {
-			fmt.Println(indx)
-			break
-		}
-
-		indx += 1
-	}
+	SlidingWindow(inputResult, 14)
 }
