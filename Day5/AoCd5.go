@@ -43,7 +43,7 @@ func GetFormattedData() ([][]string, []string) {
 	return formattedArr, parse
 }
 
-func UpdateArray(parse []string, formattedArray [][]string, reverse bool) [][]string {
+func UpdateArray(formattedArray [][]string, parse []string, reverse bool) [][]string {
 	for _, v := range parse[10:] {
 		splitThings := strings.Split(v, " ")
 		amountToPop, _ := strconv.Atoi(splitThings[1])
@@ -73,7 +73,7 @@ func UpdateArray(parse []string, formattedArray [][]string, reverse bool) [][]st
 func Part1() {
 	formattedArray, parse := GetFormattedData()
 
-	formattedArray = UpdateArray(parse, formattedArray, true)
+	formattedArray = UpdateArray(formattedArray, parse, true)
 
 	for _, v := range formattedArray {
 		fmt.Print(v[len(v)-1])
@@ -84,7 +84,7 @@ func Part1() {
 func Part2() {
 	formattedArray, parse := GetFormattedData()
 
-	formattedArray = UpdateArray(parse, formattedArray, false)
+	formattedArray = UpdateArray(formattedArray, parse, false)
 
 	for _, v := range formattedArray {
 		fmt.Print(v[len(v)-1])
