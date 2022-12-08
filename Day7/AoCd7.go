@@ -13,11 +13,11 @@ func main() {
 	// Part2()
 }
 
-type Folder struct {
-	Name            string
-	ParentDirectory string
-	Files           []int
-	NestedFolders   []string
+type Directory struct {
+	Name              string
+	ParentDirectory   *Directory
+	Files             []int
+	NestedDirectories []*Directory
 }
 
 func Part1() {
@@ -25,30 +25,43 @@ func Part1() {
 
 	parse := strings.Split(inputResult, "\r\n")
 
-	currentWorkingDirectory := Folder{
-		Name:            "/",
-		Files:           nil,
-		NestedFolders:   nil,
-		ParentDirectory: ""}
+	currentWorkingDirectory := &Directory{
+		Name:              "/",
+		Files:             nil,
+		NestedDirectories: nil,
+		ParentDirectory:   nil}
 
-	mapOfFolders := make(map[string]Folder)
+	mapOfFolders := make(map[string]*Directory)
+
+	mapOfFolders[currentWorkingDirectory.Name] = currentWorkingDirectory
 
 	for i, v := range parse {
-		if v[0:4] == "$ ls" {
+		if strings.HasPrefix(v, "$ ls") {
 			continue
-		} else if v[0:3] == "dir" {
-			currentWorkingDirectory.NestedFolders = append(currentWorkingDirectory.NestedFolders, v[4:])
-		} else if v[0:4] == "$ cd" {
-			mapOfFolders[currentWorkingDirectory.Name] = currentWorkingDirectory
-			if v[5:] == ".." {
-				currentWorkingDirectory = mapOfFolders[currentWorkingDirectory.ParentDirectory]
+		} else if strings.HasPrefix(v, "dir") {
+			if _, exists := mapOfFolders[fmt.Sprintf("%v/%v", currentWorkingDirectory.Name, v[4:])]; exists {
+				currentWorkingDirectory.NestedDirectories =
+					append(currentWorkingDirectory.NestedDirectories,
+						mapOfFolders[fmt.Sprintf("%v/%v", currentWorkingDirectory.Name, v[4:])])
 			} else {
-				currentWorkingDirectory =
-					Folder{
-						Name:            currentWorkingDirectory.Name + v[5:],
-						Files:           nil,
-						NestedFolders:   nil,
-						ParentDirectory: currentWorkingDirectory.Name}
+				newDirectory := &Directory{
+					Name:              fmt.Sprintf("%v/%v", currentWorkingDirectory.Name, v[4:]),
+					Files:             nil,
+					NestedDirectories: nil,
+					ParentDirectory:   currentWorkingDirectory}
+				currentWorkingDirectory.NestedDirectories =
+					append(currentWorkingDirectory.NestedDirectories, newDirectory)
+				mapOfFolders[newDirectory.Name] = newDirectory
+			}
+		} else if strings.HasPrefix(v, "$ cd") {
+			mapOfFolders[currentWorkingDirectory.Name] = currentWorkingDirectory
+			if strings.HasSuffix(v, "..") {
+				currentWorkingDirectory = mapOfFolders[currentWorkingDirectory.ParentDirectory.Name]
+			} else if strings.HasSuffix(v, "/") {
+				currentWorkingDirectory = mapOfFolders["/"]
+			} else {
+				p := fmt.Sprintf("%v/%v", currentWorkingDirectory.Name, v[5:])
+				currentWorkingDirectory = mapOfFolders[p]
 			}
 		} else {
 			x, _ := strconv.Atoi(strings.Split(v, " ")[0])
@@ -70,11 +83,11 @@ func Part1() {
 	fmt.Println(total)
 }
 
-func RecursionThroughFolders(folderStructure map[string]Folder, pwd Folder) int {
+func RecursionThroughFolders(folderStructure map[string]*Directory, pwd *Directory) int {
 	totalToReturn := 0
 	totalToReturn += Sum(pwd.Files)
-	for _, dir := range pwd.NestedFolders {
-		totalToReturn += RecursionThroughFolders(folderStructure, folderStructure[dir])
+	for _, dir := range pwd.NestedDirectories {
+		totalToReturn += RecursionThroughFolders(folderStructure, folderStructure[dir.Name])
 	}
 	return totalToReturn
 }
