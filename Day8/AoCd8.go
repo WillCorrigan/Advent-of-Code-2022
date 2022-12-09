@@ -9,8 +9,23 @@ import (
 )
 
 func main() {
-	Part1()
-	// Part2()
+	// Part1()
+	Part2()
+}
+
+func transposeTreeArr(arr [][]Tree) [][]Tree {
+	xl := len(arr[0])
+	yl := len(arr)
+	transposedArr := make([][]Tree, xl)
+	for i := range transposedArr {
+		transposedArr[i] = make([]Tree, yl)
+	}
+	for i := 0; i < len(arr[0]); i++ {
+		for x := 0; x < len(arr); x++ {
+			transposedArr[i][x] = arr[x][i]
+		}
+	}
+	return transposedArr
 }
 
 type Tree struct {
@@ -102,21 +117,118 @@ func Part1() {
 	fmt.Println(total)
 }
 
-func transposeTreeArr(arr [][]Tree) [][]Tree {
-	xl := len(arr[0])
-	yl := len(arr)
-	transposedArr := make([][]Tree, xl)
-	for i := range transposedArr {
-		transposedArr[i] = make([]Tree, yl)
-	}
-	for i := 0; i < len(arr[0]); i++ {
-		for x := 0; x < len(arr); x++ {
-			transposedArr[i][x] = arr[x][i]
-		}
-	}
-	return transposedArr
+type ScenicTree struct {
+	Value int
+	North int
+	East  int
+	South int
+	West  int
 }
 
-// func Part2() {
+func Part2() {
+	inputResult := loadTextInput.LoadInput("input.txt")
+	lines := strings.Split(inputResult, "\r\n")
 
-// }
+	var treeArr [][]ScenicTree
+	var formattedArray [][]int
+
+	for _, line := range lines {
+		var tmpArr []int
+
+		splitLine := strings.Split(line, "")
+
+		for _, v := range splitLine {
+			val, _ := strconv.Atoi(v)
+			tmpArr = append(tmpArr, val)
+		}
+		formattedArray = append(formattedArray, tmpArr)
+	}
+
+	var currentMaxHeight int
+
+	//iterate through input lines
+	for rowIndex, row := range formattedArray {
+
+		var lineScenicTreeArray []ScenicTree
+
+		//iterate through line split values
+		for itemIndex, itemValue := range row {
+			currentMaxHeight = itemValue
+
+			tree := ScenicTree{
+				Value: itemValue,
+				North: 0,
+				East:  0,
+				South: 0,
+				West:  0,
+			}
+
+			//Check North
+			for formattedArrayIndx := rowIndex - 1; formattedArrayIndx >= 0; formattedArrayIndx-- {
+				if formattedArray[formattedArrayIndx][itemIndex] < currentMaxHeight {
+					tree.North += 1
+				}
+				if formattedArray[formattedArrayIndx][itemIndex] >= currentMaxHeight {
+					tree.North += 1
+					break
+				}
+			}
+
+			//Check East
+			for eastIndex := (itemIndex + 1); eastIndex < len(row); eastIndex++ {
+				if row[eastIndex] < currentMaxHeight {
+					tree.East += 1
+				}
+				if row[eastIndex] >= currentMaxHeight {
+					tree.East += 1
+					break
+				}
+			}
+
+			//Check South
+			for formattedArrayIndx := rowIndex + 1; formattedArrayIndx < len(formattedArray); formattedArrayIndx++ {
+				if formattedArray[formattedArrayIndx][itemIndex] < currentMaxHeight {
+					tree.South += 1
+				}
+				if formattedArray[formattedArrayIndx][itemIndex] >= currentMaxHeight {
+					tree.South += 1
+					break
+				}
+			}
+
+			//Check West
+			for westIndex := (itemIndex - 1); westIndex >= 0; westIndex-- {
+				if row[westIndex] < currentMaxHeight {
+					tree.West += 1
+				}
+				if row[westIndex] >= currentMaxHeight {
+					tree.West += 1
+					break
+				}
+			}
+
+			lineScenicTreeArray = append(lineScenicTreeArray, tree)
+		}
+		treeArr = append(treeArr, lineScenicTreeArray)
+		currentMaxHeight = 0
+	}
+
+	var answerArr []int
+	for _, row := range treeArr {
+		for _, scenicTree := range row {
+			answerArr = append(answerArr,
+				(scenicTree.North *
+					scenicTree.East *
+					scenicTree.South *
+					scenicTree.West))
+		}
+	}
+
+	var total int
+	for _, val := range answerArr {
+		if val > total {
+			total = val
+		}
+	}
+	fmt.Printf("Part 2 Answer: %v", total)
+}
