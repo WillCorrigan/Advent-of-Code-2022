@@ -22,39 +22,99 @@ func Part1() {
 	inputResult := loadTextInput.LoadInput("input.txt")
 	lines := strings.Split(inputResult, "\r\n")
 
-	var inputArr [][]*Tree
+	var treeArr [][]Tree
 
-	for _, line := range lines {
-		var tmpArr []*Tree
-		splt := strings.Split(line, "")
-		for _, v := range splt {
-			val, err := strconv.Atoi(v)
-			if err == nil {
-				test := &Tree{
+	for lineIndx, line := range lines {
+
+		var lineTreeArray []Tree
+
+		splitLine := strings.Split(line, "")
+		currentMaxHeight, _ := strconv.Atoi(splitLine[0])
+
+		//left to right
+		for i, v := range splitLine {
+			val, _ := strconv.Atoi(v)
+
+			if lineIndx == 0 || lineIndx == len(lines)-1 || i == 0 || i == len(splitLine)-1 || val > currentMaxHeight {
+				tree := Tree{
+					Value:   val,
+					Visible: true}
+
+				lineTreeArray = append(lineTreeArray, tree)
+			} else {
+				tree := Tree{
 					Value:   val,
 					Visible: false}
 
-				tmpArr = append(tmpArr, test)
+				lineTreeArray = append(lineTreeArray, tree)
+			}
+			if val > currentMaxHeight {
+				currentMaxHeight = val
 			}
 		}
-		inputArr = append(inputArr, tmpArr)
+		treeArr = append(treeArr, lineTreeArray)
 	}
 
-	for _, v := range inputArr[0] {
-		v.Visible = true
-	}
-	for _, v := range inputArr[len(inputArr)-1] {
-		v.Visible = true
-	}
-	for i := 0; i < len(inputArr); i++ {
-		inputArr[i][0].Visible = true
-	}
-
-	for i := 0; i < len(inputArr); i++ {
-		inputArr[i][len(inputArr)-1].Visible = true
+	var currentMaxHeight int
+	//right to left
+	for i := len(treeArr) - 1; i >= 0; i-- {
+		for j := len(treeArr[i]) - 1; j >= 0; j-- {
+			if treeArr[i][j].Value > currentMaxHeight {
+				treeArr[i][j].Visible = true
+				currentMaxHeight = treeArr[i][j].Value
+			}
+		}
+		currentMaxHeight = 0
 	}
 
-	fmt.Println(inputArr)
+	transposedArr := transposeTreeArr(treeArr)
+
+	//down to up
+	for i := len(transposedArr) - 1; i >= 0; i-- {
+		for j := len(transposedArr[i]) - 1; j >= 0; j-- {
+			if transposedArr[i][j].Value > currentMaxHeight {
+				transposedArr[i][j].Visible = true
+				currentMaxHeight = transposedArr[i][j].Value
+			}
+		}
+		currentMaxHeight = 0
+	}
+
+	//up to down
+	for i := 0; i < len(transposedArr); i++ {
+		for j := 0; j < len(transposedArr); j++ {
+			if transposedArr[i][j].Value > currentMaxHeight {
+				transposedArr[i][j].Visible = true
+				currentMaxHeight = transposedArr[i][j].Value
+			}
+		}
+		currentMaxHeight = 0
+	}
+
+	var total int
+	for _, v := range transposedArr {
+		for _, vInner := range v {
+			if vInner.Visible {
+				total += 1
+			}
+		}
+	}
+	fmt.Println(total)
+}
+
+func transposeTreeArr(arr [][]Tree) [][]Tree {
+	xl := len(arr[0])
+	yl := len(arr)
+	transposedArr := make([][]Tree, xl)
+	for i := range transposedArr {
+		transposedArr[i] = make([]Tree, yl)
+	}
+	for i := 0; i < len(arr[0]); i++ {
+		for x := 0; x < len(arr); x++ {
+			transposedArr[i][x] = arr[x][i]
+		}
+	}
+	return transposedArr
 }
 
 // func Part2() {
