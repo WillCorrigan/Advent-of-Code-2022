@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	// Part1()
+	Part1()
 	Part2()
 }
 
@@ -114,7 +114,7 @@ func Part1() {
 			}
 		}
 	}
-	fmt.Println(total)
+	fmt.Printf("Part 1 Answer: %v\n", total)
 }
 
 type ScenicTree struct {
@@ -230,5 +230,5 @@ func Part2() {
 			total = val
 		}
 	}
-	fmt.Printf("Part 2 Answer: %v", total)
+	fmt.Printf("Part 2 Answer: %v\n", total)
 }
